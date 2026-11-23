@@ -1,0 +1,1896 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Benchmarking de Redes Sociais | Júlio & Thiago</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --ink: #0f0f0f;
+    --ink-mid: #3a3a3a;
+    --ink-light: #6b6b6b;
+    --paper: #f8f6f1;
+    --rule: #d8d2c8;
+    --accent: #1a3d6b;
+    --accent-warm: #c94f1e;
+    --accent-pale: #e8f0f8;
+    --white: #ffffff;
+    --jan: #1a3d6b;
+    --thais: #7b3fa0;
+    --vic: #c94f1e;
+    --lar: #1a7a4a;
+    --jan-pale: #e8f0f8;
+    --thais-pale: #f3ecf9;
+    --vic-pale: #fdf0eb;
+    --lar-pale: #e8f5ee;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { font-size: 16px; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.6;
+  }
+
+  /* ── PRINT STYLES ── */
+  @media print {
+    .no-print { display: none !important; }
+    .section { page-break-inside: avoid; }
+    body { background: white; }
+  }
+
+  /* ── NAV ── */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--ink);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 3rem;
+    height: 52px;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .nav-brand { font-family: 'DM Serif Display', serif; font-size: 1rem; letter-spacing: 0.02em; text-transform: none; }
+
+  .nav-links { display: flex; gap: 2rem; }
+
+  .nav-links a {
+    color: rgba(255,255,255,0.6);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--white); }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--ink);
+    color: var(--white);
+    padding: 6rem 3rem 5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 119px,
+      rgba(255,255,255,0.03) 119px,
+      rgba(255,255,255,0.03) 120px
+    );
+  }
+
+  .hero-inner { max-width: 1100px; margin: 0 auto; position: relative; }
+
+  .hero-eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2.6rem, 5vw, 4.2rem);
+    line-height: 1.08;
+    font-weight: 400;
+    max-width: 780px;
+    margin-bottom: 2rem;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    margin-top: 2rem;
+  }
+
+  .hero-meta-item label {
+    display: block;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 0.25rem;
+  }
+
+  .hero-meta-item span {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.8);
+  }
+
+  .hero-profiles {
+    display: flex;
+    gap: 1rem;
+    margin-top: 3rem;
+    flex-wrap: wrap;
+  }
+
+  .hero-profile-tag {
+    padding: 0.4rem 1.1rem;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 2px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+
+  .hero-profile-tag.jan { border-color: var(--jan); color: #7ba8d4; }
+  .hero-profile-tag.tha { border-color: var(--thais); color: #c49de0; }
+  .hero-profile-tag.vic { border-color: var(--vic); color: #e8967a; }
+  .hero-profile-tag.lar { border-color: var(--lar); color: #70c497; }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 3rem; }
+
+  .section { padding: 5rem 0; }
+
+  .section + .section { border-top: 1px solid var(--rule); }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--ink-light);
+    letter-spacing: 0.08em;
+    min-width: 2.5rem;
+  }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+    font-weight: 400;
+    color: var(--ink);
+  }
+
+  .section-sub {
+    font-size: 0.88rem;
+    color: var(--ink-light);
+    margin-top: 0.4rem;
+    max-width: 640px;
+    line-height: 1.65;
+  }
+
+  /* ── PROFILE CARDS GRID ── */
+  .profiles-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5px;
+    background: var(--rule);
+    border: 1.5px solid var(--rule);
+    margin-bottom: 3rem;
+  }
+
+  .profile-card {
+    background: var(--white);
+    padding: 1.8rem 1.5rem;
+  }
+
+  .profile-card-header {
+    padding-bottom: 1.2rem;
+    margin-bottom: 1.2rem;
+    border-bottom: 3px solid;
+  }
+
+  .profile-card-header.jan { border-color: var(--jan); }
+  .profile-card-header.tha { border-color: var(--thais); }
+  .profile-card-header.vic { border-color: var(--vic); }
+  .profile-card-header.lar { border-color: var(--lar); }
+
+  .profile-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    line-height: 1.2;
+    margin-bottom: 0.35rem;
+  }
+
+  .profile-niche {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+  }
+
+  .profile-stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--rule);
+    gap: 0.5rem;
+  }
+
+  .profile-stat-row:last-child { border-bottom: none; }
+
+  .stat-label {
+    font-size: 0.72rem;
+    color: var(--ink-light);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+  }
+
+  .stat-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-align: right;
+  }
+
+  .stat-value.jan { color: var(--jan); }
+  .stat-value.tha { color: var(--thais); }
+  .stat-value.vic { color: var(--vic); }
+  .stat-value.lar { color: var(--lar); }
+
+  /* ── SCREENSHOT PLACEHOLDERS ── */
+  .screenshots-section {
+    margin-top: 2rem;
+  }
+
+  .screenshots-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .screenshot-slot {
+    border: 2px dashed var(--rule);
+    border-radius: 4px;
+    background: var(--white);
+    padding: 1rem;
+  }
+
+  .screenshot-slot-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+  }
+
+  .screenshot-slot-label.jan { color: var(--jan); }
+  .screenshot-slot-label.tha { color: var(--thais); }
+  .screenshot-slot-label.vic { color: var(--vic); }
+  .screenshot-slot-label.lar { color: var(--lar); }
+
+  .screenshot-box {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    aspect-ratio: 9/16;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: var(--ink-light);
+    font-size: 0.75rem;
+    text-align: center;
+    padding: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .screenshot-box:hover { background: #f0ede6; }
+
+  .screenshot-box svg { opacity: 0.35; }
+
+  .screenshot-box span { opacity: 0.5; font-style: italic; }
+
+  .screenshot-multi {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .screenshot-box.small {
+    aspect-ratio: 1/1;
+  }
+
+  .screenshot-caption {
+    font-size: 0.68rem;
+    color: var(--ink-light);
+    margin-top: 0.5rem;
+    font-style: italic;
+    text-align: center;
+  }
+
+  /* ── COMPARISON TABLE ── */
+  .comp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.83rem;
+    background: var(--white);
+    border: 1.5px solid var(--rule);
+  }
+
+  .comp-table thead tr {
+    background: var(--ink);
+    color: var(--white);
+  }
+
+  .comp-table th {
+    padding: 0.9rem 1rem;
+    text-align: left;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .comp-table th:first-child { width: 160px; }
+
+  .comp-table th.jan { color: #7ba8d4; }
+  .comp-table th.tha { color: #c49de0; }
+  .comp-table th.vic { color: #e8967a; }
+  .comp-table th.lar { color: #70c497; }
+
+  .comp-table td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--rule);
+    border-right: 1px solid var(--rule);
+    vertical-align: top;
+    line-height: 1.55;
+    color: var(--ink-mid);
+  }
+
+  .comp-table td:last-child { border-right: none; }
+
+  .comp-table tr:last-child td { border-bottom: none; }
+
+  .comp-table tbody tr:nth-child(even) td { background: var(--paper); }
+
+  .comp-table td:first-child {
+    font-weight: 600;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink);
+    background: var(--paper) !important;
+    border-right: 2px solid var(--rule);
+  }
+
+  /* ── ENGAGEMENT BAR ── */
+  .engagement-visual {
+    background: var(--white);
+    border: 1.5px solid var(--rule);
+    padding: 2rem;
+    margin-top: 2rem;
+  }
+
+  .eng-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+  }
+
+  .eng-row {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .eng-row:last-child { margin-bottom: 0; }
+
+  .eng-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    width: 140px;
+    flex-shrink: 0;
+  }
+
+  .eng-bar-wrap {
+    flex: 1;
+    background: var(--paper);
+    height: 28px;
+    position: relative;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .eng-bar {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.8s ease;
+    display: flex;
+    align-items: center;
+    padding-left: 0.6rem;
+  }
+
+  .eng-bar span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--white);
+  }
+
+  .eng-bar.jan { background: var(--jan); width: 7.9%; }
+  .eng-bar.tha { background: var(--thais); width: 15.9%; }
+  .eng-bar.vic { background: var(--vic); width: 100%; }
+  .eng-bar.lar { background: var(--lar); width: 33%; }
+
+  /* ── SWOT ── */
+  .swot-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+    margin-top: 2rem;
+  }
+
+  .swot-profile-block {
+    background: var(--white);
+    border: 1.5px solid var(--rule);
+    overflow: hidden;
+  }
+
+  .swot-profile-title {
+    padding: 1rem 1.5rem;
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    border-bottom: 3px solid;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .swot-profile-title.jan { border-color: var(--jan); }
+  .swot-profile-title.tha { border-color: var(--thais); }
+  .swot-profile-title.vic { border-color: var(--vic); }
+  .swot-profile-title.lar { border-color: var(--lar); }
+
+  .swot-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .swot-dot.jan { background: var(--jan); }
+  .swot-dot.tha { background: var(--thais); }
+  .swot-dot.vic { background: var(--vic); }
+  .swot-dot.lar { background: var(--lar); }
+
+  .swot-quadrants {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .swot-q {
+    padding: 1.2rem 1.5rem;
+    border-right: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .swot-q:nth-child(2n) { border-right: none; }
+  .swot-q:nth-child(3), .swot-q:nth-child(4) { border-bottom: none; }
+
+  .swot-q-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .swot-q-label.S { color: #1a7a4a; }
+  .swot-q-label.W { color: #c94f1e; }
+  .swot-q-label.O { color: #1a3d6b; }
+  .swot-q-label.T { color: #7b3fa0; }
+
+  .swot-q ul {
+    list-style: none;
+    font-size: 0.78rem;
+    color: var(--ink-mid);
+    line-height: 1.6;
+  }
+
+  .swot-q ul li {
+    padding: 0.15rem 0 0.15rem 1rem;
+    position: relative;
+  }
+
+  .swot-q ul li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--rule);
+    font-size: 0.7rem;
+  }
+
+  /* ── AUDIENCE JOURNEY ── */
+  .journey-wrap {
+    background: var(--white);
+    border: 1.5px solid var(--rule);
+    padding: 2.5rem;
+    margin-top: 2rem;
+  }
+
+  .journey-stages {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+    position: relative;
+  }
+
+  .journey-stages::before {
+    content: '';
+    position: absolute;
+    top: 28px;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--jan), var(--thais), var(--vic), var(--lar));
+    z-index: 0;
+  }
+
+  .journey-stage {
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    padding: 0 0.5rem;
+  }
+
+  .journey-dot {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .journey-stage-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+    color: var(--ink);
+  }
+
+  .journey-stage-desc {
+    font-size: 0.73rem;
+    color: var(--ink-light);
+    line-height: 1.55;
+  }
+
+  .journey-emotion-bar {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--rule);
+  }
+
+  .journey-emotion-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    margin-bottom: 1rem;
+  }
+
+  .emotion-track {
+    display: flex;
+    gap: 0;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.6rem;
+  }
+
+  .emotion-seg { flex: 1; }
+  .emotion-seg.neg { background: #c94f1e; }
+  .emotion-seg.neu { background: #d8d2c8; }
+  .emotion-seg.pos { background: #1a7a4a; }
+
+  .emotion-legend {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.7rem;
+    color: var(--ink-light);
+  }
+
+  .emotion-legend span {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .em-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .em-dot.neg { background: #c94f1e; }
+  .em-dot.neu { background: #d8d2c8; }
+  .em-dot.pos { background: #1a7a4a; }
+
+  /* ── SENTIMENT ANALYSIS ── */
+  .sentiment-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .sentiment-card {
+    background: var(--white);
+    border: 1.5px solid var(--rule);
+    padding: 1.5rem;
+  }
+
+  .sent-header {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid;
+  }
+
+  .sent-header.jan { border-color: var(--jan); }
+  .sent-header.tha { border-color: var(--thais); }
+  .sent-header.vic { border-color: var(--vic); }
+  .sent-header.lar { border-color: var(--lar); }
+
+  .sent-name { font-family: 'DM Serif Display', serif; font-size: 0.95rem; }
+
+  .sent-tone {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 0.25rem;
+  }
+
+  .sent-tone.jan { color: var(--jan); }
+  .sent-tone.tha { color: var(--thais); }
+  .sent-tone.vic { color: var(--vic); }
+  .sent-tone.lar { color: var(--lar); }
+
+  .sent-pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .sent-pill {
+    font-size: 0.68rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 2px;
+    font-weight: 500;
+  }
+
+  .sent-pill.pos { background: #e8f5ee; color: #1a7a4a; }
+  .sent-pill.neg { background: #fdf0eb; color: #c94f1e; }
+  .sent-pill.neu { background: var(--paper); color: var(--ink-mid); }
+
+  .sent-insight {
+    font-size: 0.75rem;
+    color: var(--ink-mid);
+    line-height: 1.6;
+    border-left: 2px solid var(--rule);
+    padding-left: 0.8rem;
+    font-style: italic;
+  }
+
+  /* ── PRESCRIPTIVE ── */
+  .prescriptive-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .prescription-card {
+    background: var(--white);
+    border: 1.5px solid var(--rule);
+    padding: 1.8rem;
+  }
+
+  .rx-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--rule);
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+
+  .rx-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    color: var(--ink);
+  }
+
+  .rx-body {
+    font-size: 0.8rem;
+    color: var(--ink-mid);
+    line-height: 1.7;
+  }
+
+  .rx-tag {
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.7rem;
+    background: var(--accent-pale);
+    color: var(--accent);
+    border-radius: 2px;
+  }
+
+  /* ── DIAGNOSTIC ── */
+  .diagnostic-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+
+  .diag-block {
+    background: var(--white);
+    border: 1.5px solid var(--rule);
+    padding: 1.8rem;
+  }
+
+  .diag-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .diag-item {
+    padding: 0.8rem 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 0.82rem;
+    color: var(--ink-mid);
+    line-height: 1.6;
+  }
+
+  .diag-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+  .diag-item strong { color: var(--ink); }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--ink);
+    color: rgba(255,255,255,0.45);
+    padding: 2.5rem 3rem;
+    font-size: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 5rem;
+  }
+
+  .footer strong { color: rgba(255,255,255,0.7); }
+
+  /* ── CALLOUT ── */
+  .callout {
+    background: var(--accent);
+    color: var(--white);
+    padding: 2rem 2.5rem;
+    margin: 2.5rem 0;
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+  }
+
+  .callout-icon { font-size: 1.4rem; flex-shrink: 0; line-height: 1.4; }
+
+  .callout-text { font-size: 0.88rem; line-height: 1.7; }
+
+  .callout-text strong { font-weight: 700; display: block; margin-bottom: 0.3rem; }
+
+  /* ── TAGS ── */
+  .tag-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.8rem; }
+
+  .tag {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.65rem;
+    border-radius: 2px;
+    border: 1px solid var(--rule);
+    color: var(--ink-mid);
+  }
+
+  /* ── INDEX / TOC ── */
+  .toc {
+    background: var(--white);
+    border: 1.5px solid var(--rule);
+    padding: 2rem 2.5rem;
+    margin-bottom: 3rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem 2rem;
+  }
+
+  .toc-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--rule);
+    text-decoration: none;
+    color: var(--ink);
+    font-size: 0.82rem;
+    transition: color 0.15s;
+  }
+
+  .toc-item:hover { color: var(--accent); }
+
+  .toc-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--ink-light);
+    min-width: 1.8rem;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .profiles-grid, .swot-grid, .sentiment-grid, .screenshots-grid { grid-template-columns: 1fr 1fr; }
+    .prescriptive-grid { grid-template-columns: 1fr; }
+    .journey-stages { grid-template-columns: 1fr 1fr; }
+    .toc { grid-template-columns: 1fr; }
+    .container { padding: 0 1.5rem; }
+    .hero { padding: 3.5rem 1.5rem 3rem; }
+    .nav { padding: 0 1.5rem; }
+    .nav-links { display: none; }
+    .hero-meta { flex-wrap: wrap; gap: 1.5rem; }
+    .diagnostic-cols { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 600px) {
+    .profiles-grid, .sentiment-grid, .screenshots-grid { grid-template-columns: 1fr; }
+    .swot-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <span class="nav-brand">Benchmarking</span>
+  <div class="nav-links no-print">
+    <a href="#perfis">Perfis</a>
+    <a href="#dados">Dados</a>
+    <a href="#swot">SWOT</a>
+    <a href="#sentimentos">Sentimentos</a>
+    <a href="#jornada">Jornada</a>
+    <a href="#prescricao">Prescrição</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <p class="hero-eyebrow">Análise estratégica · Redes sociais · 2025</p>
+    <h1>Benchmarking de <em>Redes Sociais</em><br>para Júlio &amp; Thiago</h1>
+    <p style="color:rgba(255,255,255,0.55); font-size:0.9rem; max-width:580px; line-height:1.7;">
+      Estudo comparativo de 4 perfis do setor jurídico-trabalhista: padrões de gestão, comportamento de audiência, formatos de conteúdo e oportunidades estratégicas.
+    </p>
+    <div class="hero-profiles">
+      <span class="hero-profile-tag jan">Janaína Bastos</span>
+      <span class="hero-profile-tag tha">Thais Inácia</span>
+      <span class="hero-profile-tag vic">Victória Lopes</span>
+      <span class="hero-profile-tag lar">Larissa Brandão</span>
+    </div>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <label>Perfis analisados</label>
+        <span>4 advogadas trabalhistas</span>
+      </div>
+      <div class="hero-meta-item">
+        <label>Plataformas</label>
+        <span>Instagram · TikTok</span>
+      </div>
+      <div class="hero-meta-item">
+        <label>Método</label>
+        <span>SWOT · Análise de sentimentos · Jornada do público</span>
+      </div>
+      <div class="hero-meta-item">
+        <label>Objetivo</label>
+        <span>Posicionamento estratégico diferenciado</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+
+  <!-- TOC -->
+  <div class="section" id="sumario">
+    <div class="section-header">
+      <span class="section-num">00</span>
+      <div>
+        <h2 class="section-title">Índice</h2>
+        <p class="section-sub">Navegue pelas seções desta análise.</p>
+      </div>
+    </div>
+    <nav class="toc">
+      <a class="toc-item" href="#perfis"><span class="toc-num">01</span> Perfis &amp; Dados Quantitativos</a>
+      <a class="toc-item" href="#visual"><span class="toc-num">02</span> Referências Visuais</a>
+      <a class="toc-item" href="#dados"><span class="toc-num">03</span> Comparativo Completo</a>
+      <a class="toc-item" href="#engajamento"><span class="toc-num">04</span> Análise de Engajamento</a>
+      <a class="toc-item" href="#swot"><span class="toc-num">05</span> Análise SWOT por Perfil</a>
+      <a class="toc-item" href="#comentarios"><span class="toc-num">06</span> Análise de Comentários</a>
+      <a class="toc-item" href="#sentimentos"><span class="toc-num">07</span> Análise de Sentimentos</a>
+      <a class="toc-item" href="#jornada"><span class="toc-num">08</span> Jornada de Decisão do Público</a>
+      <a class="toc-item" href="#diagnostico"><span class="toc-num">09</span> Diagnóstico Estratégico</a>
+      <a class="toc-item" href="#prescricao"><span class="toc-num">10</span> Recomendações Prescritivas</a>
+    </nav>
+  </div>
+
+  <!-- SECTION 01: PERFIS -->
+  <div class="section" id="perfis">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <div>
+        <h2 class="section-title">Perfis &amp; Dados Quantitativos</h2>
+        <p class="section-sub">Visão consolidada das métricas principais de cada perfil analisado.</p>
+      </div>
+    </div>
+
+    <div class="profiles-grid">
+      <!-- JANAÍNA -->
+      <div class="profile-card">
+        <div class="profile-card-header jan">
+          <div class="profile-name">Janaína Bastos</div>
+          <div class="profile-niche">Trabalhista · Empresas</div>
+        </div>
+        <div class="profile-stat-row"><span class="stat-label">Instagram</span><span class="stat-value jan">663 mil</span></div>
+        <div class="profile-stat-row"><span class="stat-label">TikTok</span><span class="stat-value jan">1,7 mi</span></div>
+        <div class="profile-stat-row"><span class="stat-label">Frequência</span><span class="stat-value jan">2x/dia</span></div>
+        <div class="profile-stat-row"><span class="stat-label">Engajamento</span><span class="stat-value jan">0,18%</span></div>
+        <div class="profile-stat-row"><span class="stat-label">Tom de voz</span><span class="stat-value jan">Técnico</span></div>
+        <div class="profile-stat-row"><span class="stat-label">Formato</span><span class="stat-value jan">Vídeos curtos</span></div>
+        <div class="profile-stat-row"><span class="stat-label">Editoria</span><span class="stat-value jan">Educ. p/ empresas</span></div>
+      </div>
+
+      <!-- THAIS -->
+      <div class="profile-card">
+        <div class="profile-card-header tha">
+          <div class="profile-name">Thais Inácia</div>
+          <div class="profile-niche">Trabalhista · Reclamante</div>
+        </div>
+        <div class="profile-stat-row"><span class="stat-label">Instagram</span><span class="stat-value tha">803 mil</span></div>
+        <div class="profile-stat-row"><span class="stat-label">TikTok</span><span class="stat-value tha">840,6 mil</span></div>
+        <div class="profile-stat-row"><span class="stat-label">Frequência</span><span class="stat-value tha">4x/dia</span></div>
+        <div class="profile-stat-row"><span class="stat-label">Engajamento</span><span class="stat-value tha">0,36%</span></div>
+        <div class="profile-stat-row"><span class="stat-label">Tom de voz</span><span class="stat-value tha">Emocional</span></div>
+        <div class="profile-stat-row"><span class="stat-label">Formato</span><span class="stat-value tha">Vídeos + estáticos</span></div>
+        <div class="profile-stat-row"><span class="stat-label">Editoria</span><span class="stat-value tha">Dicas e frases</span></div>
+      </div>
+
+      <!-- VICTÓRIA -->
+      <div class="profile-card">
+        <div class="profile-card-header vic">
+          <div class="profile-name">Victória Lopes</div>
+          <div class="profile-niche">Trabalhista e Prev. · Reclamante</div>
+        </div>
+        <div class="profile-stat-row"><span class="stat-label">Instagram</span><span class="stat-value vic">25,4 mil</span></div>
+        <div class="profile-stat-row"><span class="stat-label">TikTok</span><span class="stat-value vic">5.522</span></div>
+        <div class="profile-stat-row"><span class="stat-label">Frequência</span><span class="stat-value vic">1x/dia</span></div>
+        <div class="profile-stat-row"><span class="stat-label">Engajamento</span><span class="stat-value vic">2,27%</span></div>
+        <div class="profile-stat-row"><span class="stat-label">Tom de voz</span><span class="stat-value vic">Técnico + Emo.</span></div>
+        <div class="profile-stat-row"><span class="stat-label">Formato</span><span class="stat-value vic">Vídeos + carrossel</span></div>
+        <div class="profile-stat-row"><span class="stat-label">Editoria</span><span class="stat-value vic">Dicas + memes</span></div>
+      </div>
+
+      <!-- LARISSA -->
+      <div class="profile-card">
+        <div class="profile-card-header lar">
+          <div class="profile-name">Larissa Brandão</div>
+          <div class="profile-niche">Dir. Bancário · PF e Empresas</div>
+        </div>
+        <div class="profile-stat-row"><span class="stat-label">Instagram</span><span class="stat-value lar">838 mil</span></div>
+        <div class="profile-stat-row"><span class="stat-label">TikTok</span><span class="stat-value lar">704,2 mil</span></div>
+        <div class="profile-stat-row"><span class="stat-label">Frequência</span><span class="stat-value lar">2x/dia</span></div>
+        <div class="profile-stat-row"><span class="stat-label">Engajamento</span><span class="stat-value lar">0,75%</span></div>
+        <div class="profile-stat-row"><span class="stat-label">Tom de voz</span><span class="stat-value lar">Técnico e info.</span></div>
+        <div class="profile-stat-row"><span class="stat-label">Formato</span><span class="stat-value lar">Vídeos curtos</span></div>
+        <div class="profile-stat-row"><span class="stat-label">Editoria</span><span class="stat-value lar">Educ. bancário</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 02: REFERÊNCIAS VISUAIS -->
+  <div class="section" id="visual">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <div>
+        <h2 class="section-title">Referências Visuais dos Perfis</h2>
+        <p class="section-sub">Insira capturas de tela dos perfis, posts e stories de cada concorrente para referência visual da equipe. Clique em cada espaço para adicionar as imagens manualmente ao arquivo.</p>
+      </div>
+    </div>
+
+    <!-- Janaína -->
+    <div class="screenshots-section">
+      <div style="font-family:'DM Serif Display',serif; font-size:1.1rem; margin-bottom:1rem; padding-bottom:0.8rem; border-bottom:3px solid var(--jan); color:var(--jan);">Janaína Bastos</div>
+      <div class="screenshots-grid">
+        <div class="screenshot-slot">
+          <div class="screenshot-slot-label jan">Perfil / Bio</div>
+          <div class="screenshot-box">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M6 21v-1a6 6 0 0112 0v1"/></svg>
+            <span>Print do perfil<br>@janainabastos</span>
+          </div>
+        </div>
+        <div class="screenshot-slot">
+          <div class="screenshot-slot-label jan">Feed / Grid</div>
+          <div class="screenshot-box">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            <span>Print do feed<br>Instagram</span>
+          </div>
+        </div>
+        <div class="screenshot-slot">
+          <div class="screenshot-slot-label jan">Post em destaque</div>
+          <div class="screenshot-box">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+            <span>Print de vídeo<br>de maior alcance</span>
+          </div>
+        </div>
+        <div class="screenshot-slot">
+          <div class="screenshot-slot-label jan">Comentários</div>
+          <div class="screenshot-box">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span>Print da seção<br>de comentários</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Thais -->
+    <div class="screenshots-section" style="margin-top:2.5rem;">
+      <div style="font-family:'DM Serif Display',serif; font-size:1.1rem; margin-bottom:1rem; padding-bottom:0.8rem; border-bottom:3px solid var(--thais); color:var(--thais);">Thais Inácia</div>
+      <div class="screenshots-grid">
+        <div class="screenshot-slot">
+          <div class="screenshot-slot-label tha">Perfil / Bio</div>
+          <div class="screenshot-box">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M6 21v-1a6 6 0 0112 0v1"/></svg>
+            <span>Print do perfil<br>@thaisinacia</span>
+          </div>
+        </div>
+        <div class="screenshot-slot">
+          <div class="screenshot-slot-label tha">Feed / Grid</div>
+          <div class="screenshot-box">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            <span>Print do feed<br>Instagram</span>
+          </div>
+        </div>
+        <div class="screenshot-slot">
+          <div class="screenshot-slot-label tha">Post emocional</div>
+          <div class="screenshot-box">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+            <span>Print de post<br>com maior engaj.</span>
+          </div>
+        </div>
+        <div class="screenshot-slot">
+          <div class="screenshot-slot-label tha">Post estático / frase</div>
+          <div class="screenshot-box">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>Print de frase<br>ou Twitter card</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Victória -->
+    <div class="screenshots-section" style="margin-top:2.5rem;">
+      <div style="font-family:'DM Serif Display',serif; font-size:1.1rem; margin-bottom:1rem; padding-bottom:0.8rem; border-bottom:3px solid var(--vic); color:var(--vic);">Victória Lopes</div>
+      <div class="screenshots-grid">
+        <div class="screenshot-slot">
+          <div class="screenshot-slot-label vic">Perfil / Bio</div>
+          <div class="screenshot-box">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M6 21v-1a6 6 0 0112 0v1"/></svg>
+            <span>Print do perfil<br>@victorialopes</span>
+          </div>
+        </div>
+        <div class="screenshot-slot">
+          <div class="screenshot-slot-label vic">Feed / Grid</div>
+          <div class="screenshot-box">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            <span>Print do feed<br>Instagram</span>
+          </div>
+        </div>
+        <div class="screenshot-slot">
+          <div class="screenshot-slot-label vic">Post combativo</div>
+          <div class="screenshot-box">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+            <span>Print de vídeo<br>de maior alcance</span>
+          </div>
+        </div>
+        <div class="screenshot-slot">
+          <div class="screenshot-slot-label vic">Carrossel</div>
+          <div class="screenshot-box">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><polyline points="15 10 20 12 15 14"/><polyline points="9 10 4 12 9 14"/></svg>
+            <span>Print de carrossel<br>informativo</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Larissa -->
+    <div class="screenshots-section" style="margin-top:2.5rem;">
+      <div style="font-family:'DM Serif Display',serif; font-size:1.1rem; margin-bottom:1rem; padding-bottom:0.8rem; border-bottom:3px solid var(--lar); color:var(--lar);">Larissa Brandão</div>
+      <div class="screenshots-grid">
+        <div class="screenshot-slot">
+          <div class="screenshot-slot-label lar">Perfil / Bio</div>
+          <div class="screenshot-box">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M6 21v-1a6 6 0 0112 0v1"/></svg>
+            <span>Print do perfil<br>@larissabrandao</span>
+          </div>
+        </div>
+        <div class="screenshot-slot">
+          <div class="screenshot-slot-label lar">Feed / Grid</div>
+          <div class="screenshot-box">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            <span>Print do feed<br>Instagram</span>
+          </div>
+        </div>
+        <div class="screenshot-slot">
+          <div class="screenshot-slot-label lar">Post educacional</div>
+          <div class="screenshot-box">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+            <span>Print de vídeo<br>expondo ilegalidades</span>
+          </div>
+        </div>
+        <div class="screenshot-slot">
+          <div class="screenshot-slot-label lar">Linktree / CTA</div>
+          <div class="screenshot-box">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <span>Print do Linktree<br>e links do perfil</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 03: TABELA COMPARATIVA -->
+  <div class="section" id="dados">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <div>
+        <h2 class="section-title">Comparativo Completo de Indicadores</h2>
+        <p class="section-sub">Todos os dados coletados organizados em tabela para comparação direta.</p>
+      </div>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th>Indicador</th>
+            <th class="jan">Janaína Bastos</th>
+            <th class="tha">Thais Inácia</th>
+            <th class="vic">Victória Lopes</th>
+            <th class="lar">Larissa Brandão</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Público</td>
+            <td>Trabalhista | Empresas</td>
+            <td>Trabalhista | Reclamante</td>
+            <td>Trabalhista e Previdenciário | Reclamante e Segurado</td>
+            <td>Direito Bancário | PF e Empresas</td>
+          </tr>
+          <tr>
+            <td>Seguidores Instagram</td>
+            <td>663 mil</td>
+            <td>803 mil</td>
+            <td>25,4 mil</td>
+            <td>838 mil</td>
+          </tr>
+          <tr>
+            <td>Seguidores TikTok</td>
+            <td>1,7 milhões</td>
+            <td>840,6 mil</td>
+            <td>5.522</td>
+            <td>704,2 mil</td>
+          </tr>
+          <tr>
+            <td>Frequência de posts</td>
+            <td>Média de 2x/dia</td>
+            <td>Média de 4x/dia</td>
+            <td>Média de 1x/dia</td>
+            <td>Média de 2x/dia</td>
+          </tr>
+          <tr>
+            <td>Formatos mais usados</td>
+            <td>Vídeos curtos</td>
+            <td>Vídeos curtos + posts estáticos (frases, Twitter)</td>
+            <td>Vídeos curtos e carrosséis</td>
+            <td>Vídeos curtos</td>
+          </tr>
+          <tr>
+            <td>Tx de engajamento</td>
+            <td>0,18%</td>
+            <td>0,36%</td>
+            <td>2,27%</td>
+            <td>0,75%</td>
+          </tr>
+          <tr>
+            <td>Tom de voz</td>
+            <td>Técnico</td>
+            <td>Emocional e descontraído</td>
+            <td>Técnico, emocional e entretenimento</td>
+            <td>Técnico e informativo</td>
+          </tr>
+          <tr>
+            <td>Editoria de conteúdo</td>
+            <td>Conteúdo educativo/dicas para empresas</td>
+            <td>Dicas e frases inspiracionais para trabalhadores</td>
+            <td>Dicas, notícias e memes para trabalhadores</td>
+            <td>Conteúdos educacionais, dicas, novidades e notícias sobre o setor bancário</td>
+          </tr>
+          <tr>
+            <td>Gestão de comunidade</td>
+            <td>Não faz; nenhum retorno nos comentários</td>
+            <td>Responde todos os comentários e indica direct / link na bio</td>
+            <td>Responde eventualmente; sem método de captura definido</td>
+            <td>Não responde; reclamações sobre chatbot ineficaz</td>
+          </tr>
+          <tr>
+            <td>Bio</td>
+            <td>Deixa claro o público, se posiciona como autoridade e coloca @ do escritório</td>
+            <td>Cria conexão com o público, se posiciona como autoridade e mostra total disponibilidade para atendimento</td>
+            <td>Se posiciona como autoridade enquanto deixa claro que o público é o trabalhador; coloca @ do escritório e CTA para links</td>
+            <td>Gera autoridade, se conecta com o público e tem CTA para links</td>
+          </tr>
+          <tr>
+            <td>Links do perfil</td>
+            <td>Link do site + treinamento NR-1</td>
+            <td>Site, calculadoras, quiz sobre rescisão indireta e LP sobre acidentes de trabalho</td>
+            <td>Somente WhatsApp</td>
+            <td>Linktree: site, calculadora, LPs dos cursos e WhatsApp</td>
+          </tr>
+          <tr>
+            <td>Destaques</td>
+            <td>"Meu trabalho" (vídeos criando conexão e autoridade), palestras, depoimentos, entrevistas, curso NR-1</td>
+            <td>Parcerias, clientes e "Comece aqui" com link para WhatsApp</td>
+            <td>Feedbacks, "Comece aqui", imprensa, bastidores, perguntas e respostas, dicas e livros lidos</td>
+            <td>Equipe, canais oficiais, parcerias, atuação, quem sou e consultoria</td>
+          </tr>
+          <tr>
+            <td>Fixados</td>
+            <td>Criação de autoridade: vídeo ao TikTok Awards, lançamento de livro e crescimento exponencial nas redes</td>
+            <td>Vídeo de IA divulgando a calculadora de rescisão</td>
+            <td>"Quem sou eu" e "Como agendar seu atendimento?"</td>
+            <td>Não tem</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 04: ENGAJAMENTO -->
+  <div class="section" id="engajamento">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <div>
+        <h2 class="section-title">Análise de Engajamento</h2>
+        <p class="section-sub">Taxa de engajamento comparada entre os perfis. <strong>Dado crítico:</strong> Victória Lopes, com menos seguidores, gera a maior taxa — evidenciando que tamanho de audiência não garante engajamento.</p>
+      </div>
+    </div>
+
+    <div class="engagement-visual">
+      <div class="eng-label">Taxa de engajamento por perfil (referência: Victória = 100%)</div>
+      <div class="eng-row">
+        <div class="eng-name" style="color:var(--jan)">Janaína Bastos</div>
+        <div class="eng-bar-wrap">
+          <div class="eng-bar jan"><span>0,18%</span></div>
+        </div>
+      </div>
+      <div class="eng-row">
+        <div class="eng-name" style="color:var(--thais)">Thais Inácia</div>
+        <div class="eng-bar-wrap">
+          <div class="eng-bar tha"><span>0,36%</span></div>
+        </div>
+      </div>
+      <div class="eng-row">
+        <div class="eng-name" style="color:var(--vic)">Victória Lopes</div>
+        <div class="eng-bar-wrap">
+          <div class="eng-bar vic"><span>2,27%</span></div>
+        </div>
+      </div>
+      <div class="eng-row">
+        <div class="eng-name" style="color:var(--lar)">Larissa Brandão</div>
+        <div class="eng-bar-wrap">
+          <div class="eng-bar lar"><span>0,75%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:2rem;">
+      <div class="callout-icon">💡</div>
+      <div class="callout-text">
+        <strong>Insight estratégico</strong>
+        Victória Lopes tem 25x menos seguidores que Janaína Bastos, mas gera 12,6x mais engajamento proporcional. Isso demonstra que a combinação de tom combativo, comunidade ativa e conteúdo segmentado supera o volume de audiência em termos de conexão real com o público.
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 05: SWOT -->
+  <div class="section" id="swot">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <div>
+        <h2 class="section-title">Análise SWOT por Perfil</h2>
+        <p class="section-sub">Forças, fraquezas, oportunidades e ameaças de cada concorrente — e o que isso representa para Júlio &amp; Thiago.</p>
+      </div>
+    </div>
+
+    <div class="swot-grid">
+      <!-- SWOT JANAÍNA -->
+      <div class="swot-profile-block">
+        <div class="swot-profile-title jan"><div class="swot-dot jan"></div>Janaína Bastos</div>
+        <div class="swot-quadrants">
+          <div class="swot-q">
+            <div class="swot-q-label S">S — Forças</div>
+            <ul>
+              <li>Maior base no TikTok (1,7 mi)</li>
+              <li>Autoridade estabelecida no nicho B2B</li>
+              <li>Destaques estruturados com prova social</li>
+              <li>Conteúdo fixado cria narrativa de trajetória</li>
+            </ul>
+          </div>
+          <div class="swot-q">
+            <div class="swot-q-label W">W — Fraquezas</div>
+            <ul>
+              <li>Engajamento mais baixo do grupo (0,18%)</li>
+              <li>Zero gestão de comunidade</li>
+              <li>Conteúdo técnico cria distância emocional</li>
+              <li>Público misto gera baixa identificação</li>
+            </ul>
+          </div>
+          <div class="swot-q">
+            <div class="swot-q-label O">O — Oportunidades</div>
+            <ul>
+              <li>Dúvidas dos seguidores abertas para funil</li>
+              <li>Conteúdo educativo para trabalhadores não explorado</li>
+            </ul>
+          </div>
+          <div class="swot-q">
+            <div class="swot-q-label T">T — Ameaças</div>
+            <ul>
+              <li>Percepção de distância e inacessibilidade</li>
+              <li>Crescimento pode ser de audiência passiva</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- SWOT THAIS -->
+      <div class="swot-profile-block">
+        <div class="swot-profile-title tha"><div class="swot-dot tha"></div>Thais Inácia</div>
+        <div class="swot-quadrants">
+          <div class="swot-q">
+            <div class="swot-q-label S">S — Forças</div>
+            <ul>
+              <li>Maior frequência de posts (4x/dia)</li>
+              <li>Gestão de comunidade ativa e empática</li>
+              <li>Funnel estruturado: calculadoras, quiz, LP</li>
+              <li>Alta conexão emocional com o público</li>
+            </ul>
+          </div>
+          <div class="swot-q">
+            <div class="swot-q-label W">W — Fraquezas</div>
+            <ul>
+              <li>Engajamento médio-baixo (0,36%)</li>
+              <li>Tom emocional pode reduzir credibilidade técnica</li>
+              <li>Produção intensa pode comprometer qualidade</li>
+            </ul>
+          </div>
+          <div class="swot-q">
+            <div class="swot-q-label O">O — Oportunidades</div>
+            <ul>
+              <li>Base de leads qualificados pela urgência emocional</li>
+              <li>Parcerias estratégicas já estabelecidas</li>
+            </ul>
+          </div>
+          <div class="swot-q">
+            <div class="swot-q-label T">T — Ameaças</div>
+            <ul>
+              <li>Saturação de conteúdo emocional no nicho</li>
+              <li>Público com alta dor cria expectativa de resposta imediata</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- SWOT VICTÓRIA -->
+      <div class="swot-profile-block">
+        <div class="swot-profile-title vic"><div class="swot-dot vic"></div>Victória Lopes</div>
+        <div class="swot-quadrants">
+          <div class="swot-q">
+            <div class="swot-q-label S">S — Forças</div>
+            <ul>
+              <li>Maior tx de engajamento (2,27%)</li>
+              <li>Tom combativo gera compartilhamento orgânico</li>
+              <li>Comunidade altamente ativa e engajada</li>
+              <li>Linguagem acessível e identificação máxima</li>
+            </ul>
+          </div>
+          <div class="swot-q">
+            <div class="swot-q-label W">W — Fraquezas</div>
+            <ul>
+              <li>Menor audiência absoluta do grupo</li>
+              <li>Captura de leads pouco estruturada</li>
+              <li>Sem método de conversão definido</li>
+            </ul>
+          </div>
+          <div class="swot-q">
+            <div class="swot-q-label O">O — Oportunidades</div>
+            <ul>
+              <li>Base engajada pronta para funil de conversão</li>
+              <li>Posicionamento combativo difícil de replicar</li>
+            </ul>
+          </div>
+          <div class="swot-q">
+            <div class="swot-q-label T">T — Ameaças</div>
+            <ul>
+              <li>Tom muito combativo pode afastar perfis corporativos</li>
+              <li>Crescimento limitado pelo alcance atual</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- SWOT LARISSA -->
+      <div class="swot-profile-block">
+        <div class="swot-profile-title lar"><div class="swot-dot lar"></div>Larissa Brandão</div>
+        <div class="swot-quadrants">
+          <div class="swot-q">
+            <div class="swot-q-label S">S — Forças</div>
+            <ul>
+              <li>Maior audiência no Instagram (838 mil)</li>
+              <li>Linktree com ecossistema de conversão completo</li>
+              <li>Autoridade construída denunciando ilegalidades</li>
+              <li>Conteúdo gera indignação + confiança</li>
+            </ul>
+          </div>
+          <div class="swot-q">
+            <div class="swot-q-label W">W — Fraquezas</div>
+            <ul>
+              <li>Atendimento automatizado com reclamações</li>
+              <li>Não responde comentários, cria distância</li>
+              <li>Chatbot percebido como ineficaz</li>
+            </ul>
+          </div>
+          <div class="swot-q">
+            <div class="swot-q-label O">O — Oportunidades</div>
+            <ul>
+              <li>Nichos de dívidas com alta demanda reprimida</li>
+              <li>Cursos e produtos digitais com LP estruturada</li>
+            </ul>
+          </div>
+          <div class="swot-q">
+            <div class="swot-q-label T">T — Ameaças</div>
+            <ul>
+              <li>Chatbot ruim pode destruir reputação construída</li>
+              <li>Nicho bancário diferente do trabalhista</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 06: ANÁLISE DE COMENTÁRIOS -->
+  <div class="section" id="comentarios">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <div>
+        <h2 class="section-title">Análise de Comentários das Redes Sociais</h2>
+        <p class="section-sub">Padrões de comportamento, dores e insights identificados nos comentários de cada perfil analisado.</p>
+      </div>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th>Indicador</th>
+            <th class="jan">Janaína Bastos</th>
+            <th class="tha">Thais Inácia</th>
+            <th class="vic">Victória Lopes</th>
+            <th class="lar">Larissa Brandão</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Tom geral</td>
+            <td>Técnico, focado nos processos, alguns irônicos</td>
+            <td>Altamente emocionais; compartilhamento de traumas e angústias dos trabalhadores</td>
+            <td>Combativo e irônico, sintetizando a insatisfação dos trabalhadores com empresas que não respeitam seus colaboradores</td>
+            <td>Emocional e fragilizado, reforçando a insegurança financeira do público e a falta de perspectiva de resolver suas situações</td>
+          </tr>
+          <tr>
+            <td>Dores principais</td>
+            <td>
+              Insegurança jurídica; dificuldade em encontrar colaboradores que auxiliem no processo; correlação entre dificuldade de empreender e leis trabalhistas
+            </td>
+            <td>
+              Vulnerabilidade física, mental e econômica; medo de demissão após afastamento médico; assédio moral com perseguição velada; medo do desemprego forçando trabalho em condições precárias
+            </td>
+            <td>
+              Chefes que não respeitam horário; cobrança de metas irreais; esgotamento emocional e físico; dúvidas sobre VT, VR, atestados e situações rotineiras de descumprimento trabalhista
+            </td>
+            <td>
+              Sentimento de falta de segurança e desconhecimento dos direitos; dificuldade em juntar documentos; impotência diante das empresas
+            </td>
+          </tr>
+          <tr>
+            <td>Comportamento dos seguidores</td>
+            <td>Curiosos e técnicos; movimento de trabalhadores que compartilham opinião contrária a dos empregadores e insatisfação de ser empreendedor</td>
+            <td>Usam os comentários para desabafar, contar histórias dolorosas ou íntimas; interagem muito entre si, fortalecendo comunidade; comentários com urgência extrema</td>
+            <td>Combativos, torcendo para que a Victoria publique mais; acreditam que empresas continuarão burlando leis; interagem muito quando há resposta da Victoria</td>
+            <td>Larissa constrói autoridade expondo ilegalidades que empresas cometem, gerando casos de conexão e confiabilidade no trabalho dela</td>
+          </tr>
+          <tr>
+            <td>Insights principais</td>
+            <td>
+              Cases reais geram identificação e engajamento; dúvidas dos seguidores abrem oportunidade para conversão no funil (dor → dúvida → contato com Janaína)
+            </td>
+            <td>
+              Abordagem empática com público que tem dores latentes e quer saber se o que está sofrendo é ilegal; publicações sobre doenças ocupacionais, estabilidade provisória e demissão pós-férias geram maior engajamento
+            </td>
+            <td>
+              Victoria fala a língua do trabalhador, mantém-se atualizada e atua como "protetora"; evita tom excessivamente técnico tanto nos posts quanto nos comentários; usa linguagem simples como se fosse uma amiga que entende a dor
+            </td>
+            <td>
+              A Larissa valida constantemente a indignação do público com abusos sofridos pelas empresas; conteúdos sobre PIS, saque de aniversário, etc. geram engajamento
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 07: SENTIMENTOS -->
+  <div class="section" id="sentimentos">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <div>
+        <h2 class="section-title">Análise de Sentimentos</h2>
+        <p class="section-sub">Mapeamento do estado emocional predominante nas audiências de cada perfil, com implicações estratégicas para comunicação.</p>
+      </div>
+    </div>
+
+    <div class="sentiment-grid">
+      <div class="sentiment-card">
+        <div class="sent-header jan">
+          <div class="sent-name">Janaína Bastos</div>
+          <div class="sent-tone jan">Tom: Técnico · Distante</div>
+        </div>
+        <div class="sent-pill-row">
+          <span class="sent-pill neu">Curiosidade</span>
+          <span class="sent-pill neu">Dúvida técnica</span>
+          <span class="sent-pill neg">Ironia</span>
+          <span class="sent-pill neg">Insegurança jurídica</span>
+        </div>
+        <div class="sent-insight">
+          Seguidores buscam informação, não conexão. O conteúdo técnico funciona como recurso, mas não cria vínculo emocional forte. Alta intenção racional, baixa ativação emocional.
+        </div>
+      </div>
+
+      <div class="sentiment-card">
+        <div class="sent-header tha">
+          <div class="sent-name">Thais Inácia</div>
+          <div class="sent-tone tha">Tom: Emocional · Urgente</div>
+        </div>
+        <div class="sent-pill-row">
+          <span class="sent-pill neg">Sofrimento</span>
+          <span class="sent-pill neg">Medo de demissão</span>
+          <span class="sent-pill neg">Ansiedade</span>
+          <span class="sent-pill pos">Esperança</span>
+          <span class="sent-pill pos">Validação</span>
+        </div>
+        <div class="sent-insight">
+          Público em estado de vulnerabilidade extrema usa os comentários como forma de desabafo coletivo. A Thais funciona como ponto de acolhimento emocional, criando dependência afetiva da audiência.
+        </div>
+      </div>
+
+      <div class="sentiment-card">
+        <div class="sent-header vic">
+          <div class="sent-name">Victória Lopes</div>
+          <div class="sent-tone vic">Tom: Combativo · Engajador</div>
+        </div>
+        <div class="sent-pill-row">
+          <span class="sent-pill neg">Indignação</span>
+          <span class="sent-pill neg">Revolta com empregadores</span>
+          <span class="sent-pill pos">Empoderamento</span>
+          <span class="sent-pill pos">Solidariedade</span>
+        </div>
+        <div class="sent-insight">
+          O tom combativo transforma frustração em ação. A audiência não apenas comenta — compartilha, reage e chama outros para ver. Sentimento coletivo de "não estou sozinho nisso" impulsiona o engajamento.
+        </div>
+      </div>
+
+      <div class="sentiment-card">
+        <div class="sent-header lar">
+          <div class="sent-name">Larissa Brandão</div>
+          <div class="sent-tone lar">Tom: Emocional · Fragilizado</div>
+        </div>
+        <div class="sent-pill-row">
+          <span class="sent-pill neg">Insegurança financeira</span>
+          <span class="sent-pill neg">Desamparo</span>
+          <span class="sent-pill pos">Confiança na autoridade</span>
+          <span class="sent-pill pos">Busca por solução</span>
+        </div>
+        <div class="sent-insight">
+          Público altamente fragilizado pela situação financeira. A Larissa transforma indignação em autoridade. A exposição de ilegalidades cria um ciclo: "ela sabe do que está falando → posso confiar → quero contratar".
+        </div>
+      </div>
+    </div>
+
+    <div class="callout" style="background:var(--accent-warm); margin-top:2rem;">
+      <div class="callout-icon">🎯</div>
+      <div class="callout-text">
+        <strong>Síntese da análise de sentimentos</strong>
+        O maior engajamento do mercado vem de conteúdo que ativa sentimentos de <em>indignação + empoderamento</em> (Victória) — não de conteúdo puramente técnico ou apenas empático. A combinação vencedora é: educar + validar a dor + apontar um culpado + oferecer saída.
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 08: JORNADA DE DECISÃO -->
+  <div class="section" id="jornada">
+    <div class="section-header">
+      <span class="section-num">08</span>
+      <div>
+        <h2 class="section-title">Jornada de Decisão do Público</h2>
+        <p class="section-sub">Como o trabalhador descobre, considera e decide contratar um advogado trabalhista por meio das redes sociais — e como cada concorrente atua em cada etapa.</p>
+      </div>
+    </div>
+
+    <div class="journey-wrap">
+      <div class="journey-stages">
+        <div class="journey-stage">
+          <div class="journey-dot">😤</div>
+          <div class="journey-stage-title">Gatilho</div>
+          <div class="journey-stage-desc">O trabalhador vive uma situação de injustiça: demissão abusiva, assédio, horas extras não pagas. A dor é real e imediata.</div>
+        </div>
+        <div class="journey-stage">
+          <div class="journey-dot">🔍</div>
+          <div class="journey-stage-title">Busca</div>
+          <div class="journey-stage-desc">Procura respostas no TikTok e Instagram com dúvidas específicas: "fui demitido e não recebi...", "meu chefe faz isso, posso processar?"</div>
+        </div>
+        <div class="journey-stage">
+          <div class="journey-dot">🤔</div>
+          <div class="journey-stage-title">Consideração</div>
+          <div class="journey-stage-desc">Consome conteúdo de múltiplos perfis, compara linguagem, identidade e acessibilidade. Procura quem "fala como ele".</div>
+        </div>
+        <div class="journey-stage">
+          <div class="journey-dot">✅</div>
+          <div class="journey-stage-title">Decisão</div>
+          <div class="journey-stage-desc">Envia direct, clica no WhatsApp ou acessa o link do perfil do advogado que mais gerou confiança e identificação.</div>
+        </div>
+        <div class="journey-stage">
+          <div class="journey-dot">📣</div>
+          <div class="journey-stage-title">Advocacia</div>
+          <div class="journey-stage-desc">Após resolução positiva, comenta, compartilha e indica o perfil para amigos em situação similar, ampliando o alcance orgânico.</div>
+        </div>
+      </div>
+
+      <div class="journey-emotion-bar">
+        <div class="journey-emotion-label">Estado emocional do público ao longo da jornada</div>
+        <div class="emotion-track">
+          <div class="emotion-seg neg"></div>
+          <div class="emotion-seg neg"></div>
+          <div class="emotion-seg neg"></div>
+          <div class="emotion-seg neu"></div>
+          <div class="emotion-seg pos"></div>
+        </div>
+        <div class="emotion-legend">
+          <span><span class="em-dot neg"></span>Negativo (dor, raiva, medo)</span>
+          <span><span class="em-dot neu"></span>Neutro (busca, dúvida)</span>
+          <span><span class="em-dot pos"></span>Positivo (confiança, alívio)</span>
+        </div>
+      </div>
+
+      <div style="margin-top:2rem; padding-top:2rem; border-top:1px solid var(--rule);">
+        <div style="font-size:0.72rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-light); margin-bottom:1rem;">Como cada concorrente captura a jornada</div>
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; font-size:0.76rem;">
+          <div style="padding:1rem; background:var(--jan-pale); border-left:3px solid var(--jan);">
+            <strong style="color:var(--jan); display:block; margin-bottom:0.5rem;">Janaína</strong>
+            Captura na etapa de <strong>Consideração</strong>: quem busca autoridade técnica. Perde na Decisão por não criar conexão emocional nem fazer gestão de comunidade.
+          </div>
+          <div style="padding:1rem; background:var(--thais-pale); border-left:3px solid var(--thais);">
+            <strong style="color:var(--thais); display:block; margin-bottom:0.5rem;">Thais</strong>
+            Captura na etapa de <strong>Busca e Consideração</strong>: frequência alta garante que aparece quando o público está pesquisando. Gestão de comunidade ativa acelera a Decisão.
+          </div>
+          <div style="padding:1rem; background:var(--vic-pale); border-left:3px solid var(--vic);">
+            <strong style="color:var(--vic); display:block; margin-bottom:0.5rem;">Victória</strong>
+            Captura na etapa de <strong>Gatilho e Busca</strong>: conteúdo combativo encontra o trabalhador no pico da emoção. Alta Advocacia: seguidores indicam espontaneamente.
+          </div>
+          <div style="padding:1rem; background:var(--lar-pale); border-left:3px solid var(--lar);">
+            <strong style="color:var(--lar); display:block; margin-bottom:0.5rem;">Larissa</strong>
+            Captura na etapa de <strong>Consideração</strong>: ecossistema de links (Linktree) estruturado facilita a Decisão. Perde na Advocacia pelo atendimento automatizado ineficaz.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 09: DIAGNÓSTICO -->
+  <div class="section" id="diagnostico">
+    <div class="section-header">
+      <span class="section-num">09</span>
+      <div>
+        <h2 class="section-title">Diagnóstico Estratégico</h2>
+        <p class="section-sub">Análise descritiva e diagnóstica do cenário competitivo — o que está acontecendo e por quê.</p>
+      </div>
+    </div>
+
+    <div class="diagnostic-cols">
+      <div class="diag-block">
+        <div class="diag-title">📊 Análise Descritiva — O que está acontecendo</div>
+        <div class="diag-item"><strong>Domínio de volume sem profundidade:</strong> Os três maiores perfis (Janaína, Thais, Larissa) concentram audiência massiva mas têm engajamento baixo, indicando audiências passivas ou crescimento não orgânico.</div>
+        <div class="diag-item"><strong>Engajamento qualitativo vs. quantitativo:</strong> Victória Lopes prova que 25 mil seguidores muito engajados geram mais movimento real do que 800 mil seguidores frios.</div>
+        <div class="diag-item"><strong>Nicho do trabalhador está mal servido:</strong> Janaína serve o lado B2B (empresas). Thais e Victória atendem trabalhadores com abordagem emocional. O nicho "trabalhador que quer entender seus direitos" ainda carece de voz técnica E empática.</div>
+        <div class="diag-item"><strong>Gestão de comunidade é o elo fraco:</strong> Apenas Thais faz gestão ativa. As demais deixam potencial de conversão na mesa ao não responder comentários.</div>
+        <div class="diag-item"><strong>Conteúdo fixado pouco estratégico:</strong> Exceto Janaína (que usa fixados para construir autoridade), os demais não exploram esse espaço de captura.</div>
+      </div>
+
+      <div class="diag-block">
+        <div class="diag-title">🔎 Análise Diagnóstica — Por que está acontecendo</div>
+        <div class="diag-item"><strong>Foco em volume, não em conversão:</strong> A lógica do "quanto mais postar, mais seguidores" domina o mercado. Poucos pensam em funil — apenas Thais e Larissa têm estruturas de captura de leads.</div>
+        <div class="diag-item"><strong>Tom técnico cria barreira de entrada:</strong> O direito trabalhista é visto como complexo. Profissionais que traduzem a lei para linguagem cotidiana (Victória) colhem engajamento mais alto porque reduzem esse atrito cognitivo.</div>
+        <div class="diag-item"><strong>A dor do trabalhador é subutilizada:</strong> O trabalhador com problema trabalhista está em estado emocional de alta urgência. Quem acessa essa emoção no momento certo — com empatia e solução — tem vantagem enorme de conversão.</div>
+        <div class="diag-item"><strong>Ausência de diferenciação entre advogados de trabalhadores:</strong> Thais e Victória disputam o mesmo público com abordagens similares. Há espaço para um posicionamento que una credibilidade técnica com linguagem acessível e gestão humanizada.</div>
+        <div class="diag-item"><strong>Produtos digitais como segundo pilar:</strong> Calculadoras, quizzes e LPs de Thais e Larissa mostram que o conteúdo serve também para monetização educacional — não apenas captação de clientes para processos.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 10: PRESCRIÇÃO -->
+  <div class="section" id="prescricao">
+    <div class="section-header">
+      <span class="section-num">10</span>
+      <div>
+        <h2 class="section-title">Recomendações Prescritivas</h2>
+        <p class="section-sub">Com base na análise completa, as ações estratégicas que Júlio &amp; Thiago devem priorizar para se diferenciar no mercado.</p>
+      </div>
+    </div>
+
+    <div class="prescriptive-grid">
+      <div class="prescription-card">
+        <div class="rx-num">01</div>
+        <div class="rx-title">Posicionamento híbrido: técnico + acessível</div>
+        <div class="rx-body">Ocupar o espaço que nenhum concorrente ocupa: advogados que falam com clareza técnica E linguagem de trabalhador. Nem apenas B2B (Janaína), nem apenas emocional (Thais). Um "amigo que entende a lei" com credibilidade de especialistas.</div>
+        <span class="rx-tag">Posicionamento</span>
+      </div>
+
+      <div class="prescription-card">
+        <div class="rx-num">02</div>
+        <div class="rx-title">Gestão de comunidade como diferencial</div>
+        <div class="rx-body">Responder comentários sistematicamente é o ativo mais negligenciado do mercado. Criar protocolo de resposta — mesmo que com perguntas abertas — transforma comentários em consultas e consultas em clientes. Thais prova que isso funciona; ninguém mais faz.</div>
+        <span class="rx-tag">Comunidade</span>
+      </div>
+
+      <div class="prescription-card">
+        <div class="rx-num">03</div>
+        <div class="rx-title">Construir funil de captura estruturado</div>
+        <div class="rx-body">Criar ao menos uma ferramenta de captura (calculadora de rescisão, checklist de direitos, quiz "Fui demitido sem justa causa?") para converter audiência em lead qualificado. Bio e links do perfil precisam direcionar para esse funil com clareza.</div>
+        <span class="rx-tag">Funil · Conversão</span>
+      </div>
+
+      <div class="prescription-card">
+        <div class="rx-num">04</div>
+        <div class="rx-title">Conteúdo que ativa indignação + oferece saída</div>
+        <div class="rx-body">A fórmula de maior engajamento do setor é: mostrar a injustiça → validar a emoção do trabalhador → explicar o direito violado → apresentar a solução. Victória prova isso com 2,27% de engajamento. Júlio e Thiago podem replicar com tom mais técnico e credível.</div>
+        <span class="rx-tag">Conteúdo</span>
+      </div>
+
+      <div class="prescription-card">
+        <div class="rx-num">05</div>
+        <div class="rx-title">Sócios como dupla de brand ambassadors</div>
+        <div class="rx-body">A presença de dois sócios é um ativo único neste mercado — todos os concorrentes são perfis individuais. Criar uma dinâmica de conteúdo onde Júlio e Thiago debatem casos, complementam pontos de vista ou apresentam casos juntos gera diferenciação narrativa forte e memorável.</div>
+        <span class="rx-tag">Branding</span>
+      </div>
+
+      <div class="prescription-card">
+        <div class="rx-num">06</div>
+        <div class="rx-title">Destaques estratégicos como vitrine do escritório</div>
+        <div class="rx-body">Criar destaques que cobrem: quem somos, cases reais (anonimizados), dúvidas frequentes, como funciona o processo trabalhista e como agendar. Esse espaço é visitado por quem está em fase de Consideração/Decisão — não pode ser ignorado.</div>
+        <span class="rx-tag">Perfil · UX</span>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:2.5rem; background:var(--ink);">
+      <div class="callout-icon">🏆</div>
+      <div class="callout-text">
+        <strong>Síntese executiva para Júlio &amp; Thiago</strong>
+        O mercado de direito trabalhista nas redes está dividido entre grandes audiências frias e perfis menores altamente engajados. A maior oportunidade está em construir audiência com intenção: não o maior perfil, mas o mais qualificado. O modelo a se aproximar é Victória (engajamento + comunidade) com o funil estruturado da Thais/Larissa — mas com o diferencial exclusivo da dupla de sócios e posicionamento técnico-acessível.
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- FOOTER -->
+<footer class="footer no-print">
+  <div>
+    <strong>Benchmarking · Redes Sociais</strong> — Análise estratégica para Júlio &amp; Thiago
+  </div>
+  <div>
+    Produzido em 2025 · Uso interno
+  </div>
+</footer>
+
+</body>
+</html>
